@@ -1,19 +1,20 @@
 import { Box, Button, List, ListItemButton, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
 type Post = {
-    id: number;
+    id?: number;
     title: string;
     author: string;
 };
 
-
 const Posts = () => {
+    const queryClient = useQueryClient();
     const getPosts = () => {
         return axios.get<Post[]>("http://localhost:3000/posts");
     };
+
     const { data } = useQuery({
         queryKey: ["posts"],
         queryFn: getPosts,
@@ -22,7 +23,7 @@ const Posts = () => {
     const listItems = data?.data.map((item) => {
         return (
             <ListItemButton
-                to={`/posts/${item.id}`}
+                to={`/posts/${item.id as number}`}
                 component={Link}
                 key={item.id}
             >
@@ -45,11 +46,29 @@ const Posts = () => {
         );
     });
 
+    const { mutate } = useMutation({
+        mutationFn: (newPost: Post) => {
+            return axios.post("http://localhost:3000/posts", newPost);
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+    });
+
     return (
         <>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: "2em" }}>
                 <Typography variant="h1">Posts</Typography>
-                <Button variant="contained" color="primary">
+                <Button
+                    onClick={() => {
+                        mutate({
+                            title: "Random title",
+                            author: "Random author",
+                        });
+                    }}
+                    variant="contained"
+                    color="primary"
+                >
                     New post
                 </Button>
             </Box>

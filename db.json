@@ -4,6 +4,11 @@
       "id": 1,
       "title": "Swimming",
       "author": "Den Kuznets"
+    },
+    {
+      "title": "Random title",
+      "author": "Random author",
+      "id": 2
     }
   ]
 }
