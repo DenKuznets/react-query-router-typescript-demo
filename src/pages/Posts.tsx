@@ -2,6 +2,7 @@ import { Box, Button, List, ListItemButton, Typography } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { QueryClient } from "@tanstack/react-query";
 
 type Post = {
     id?: number;
@@ -9,11 +10,25 @@ type Post = {
     author: string;
 };
 
+const getPosts = () => {
+    return axios.get<Post[]>("http://localhost:3000/posts");
+};
+
+const postsQuery = () => ({
+    queryKey: ["posts"],
+    queryFn: getPosts,
+});
+
+export const loader = (queryClient: QueryClient) => async () => {
+    const query = postsQuery();
+    return (
+        queryClient.getQueryData(query.queryKey) ??
+        (await queryClient.fetchQuery(query))
+    );
+};
+
 const Posts = () => {
     const queryClient = useQueryClient();
-    const getPosts = () => {
-        return axios.get<Post[]>("http://localhost:3000/posts");
-    };
 
     const { data } = useQuery({
         queryKey: ["posts"],
