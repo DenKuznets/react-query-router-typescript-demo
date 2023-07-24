@@ -10,7 +10,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Posts from "./pages/Posts";
 import Post from "./pages/Post";
-import {loader as postsLoader } from './pages/Posts'
+import {loader as postsLoader } from './utils/PostsLoader'
 
 const queryClient = new QueryClient();
 
@@ -22,7 +22,6 @@ const router = createBrowserRouter(
         </Route>
     )
 );
-
 
 function App() {
     return (

@@ -2,38 +2,12 @@ import { Box, Button, List, ListItemButton, Typography } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { QueryClient } from "@tanstack/react-query";
-
-type Post = {
-    id?: number;
-    title: string;
-    author: string;
-};
-
-const getPosts = () => {
-    return axios.get<Post[]>("http://localhost:3000/posts");
-};
-
-const postsQuery = () => ({
-    queryKey: ["posts"],
-    queryFn: getPosts,
-});
-
-export const loader = (queryClient: QueryClient) => async () => {
-    const query = postsQuery();
-    return (
-        queryClient.getQueryData(query.queryKey) ??
-        (await queryClient.fetchQuery(query))
-    );
-};
+import { PostType, postsQuery } from "../utils/PostsLoader";
 
 const Posts = () => {
     const queryClient = useQueryClient();
 
-    const { data } = useQuery({
-        queryKey: ["posts"],
-        queryFn: getPosts,
-    });
+    const { data } = useQuery(postsQuery);
 
     const listItems = data?.data.map((item) => {
         return (
@@ -62,7 +36,7 @@ const Posts = () => {
     });
 
     const { mutate } = useMutation({
-        mutationFn: (newPost: Post) => {
+        mutationFn: (newPost: PostType) => {
             return axios.post("http://localhost:3000/posts", newPost);
         },
         onSuccess: async () => {
